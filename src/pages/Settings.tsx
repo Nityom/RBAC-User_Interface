@@ -272,29 +272,51 @@ const Settings: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="hidden sm:block overflow-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Timestamp</TableHead>
-                    <TableHead>User</TableHead>
-                    <TableHead>Action</TableHead>
-                    <TableHead>Details</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {auditLogs.map((log) => (
-                    <TableRow key={log.id}>
-                      <TableCell>{log.timestamp}</TableCell>
-                      <TableCell>{log.user}</TableCell>
-                      <TableCell>{log.action}</TableCell>
-                      <TableCell>{log.details}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
+  <div className="block sm:hidden space-y-4">
+    {auditLogs.map((log) => (
+      <div
+        key={log.id}
+        className="bg-gray-100 border rounded-md p-4"
+      >
+        <p className="font-medium text-sm">
+          <span className="text-gray-500">Timestamp:</span> {log.timestamp}
+        </p>
+        <p className="font-medium text-sm">
+          <span className="text-gray-500">User:</span> {log.user}
+        </p>
+        <p className="font-medium text-sm">
+          <span className="text-gray-500">Action:</span> {log.action}
+        </p>
+        <p className="font-medium text-sm">
+          <span className="text-gray-500">Details:</span> {log.details}
+        </p>
+      </div>
+    ))}
+  </div>
+  <div className="hidden sm:block overflow-x-auto">
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Timestamp</TableHead>
+          <TableHead>User</TableHead>
+          <TableHead>Action</TableHead>
+          <TableHead>Details</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {auditLogs.map((log) => (
+          <TableRow key={log.id}>
+            <TableCell>{log.timestamp}</TableCell>
+            <TableCell>{log.user}</TableCell>
+            <TableCell>{log.action}</TableCell>
+            <TableCell>{log.details}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </div>
+</CardContent>
+
         </Card>
       )}
 
