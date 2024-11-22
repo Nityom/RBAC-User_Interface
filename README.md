@@ -10,8 +10,7 @@
 - [User Interface](#user-interface)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
+
 
 ## Introduction
 
@@ -72,7 +71,3 @@ We welcome contributions to improve the RBAC - User Interface. To contribute, fo
     git push origin feature-branch
     ```
 5. Create a pull request.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
