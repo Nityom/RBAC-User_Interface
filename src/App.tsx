@@ -34,6 +34,7 @@ const App: React.FC = () => {
               <Route path="/" element={<Navigate to="/dashboard" />} />
               {/* Fallback Route for Undefined Paths */}
               <Route path="/settings" element={<Settings />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
         </div>
