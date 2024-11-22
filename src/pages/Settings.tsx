@@ -35,6 +35,7 @@ interface Department {
 }
 
 interface AuditLog {
+  id: number;
   timestamp: string;
   user: string;
   action: string;
@@ -46,10 +47,25 @@ const Settings: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([
     {
-      timestamp: "2024-03-23 14:30",
+      id: 1,
+      timestamp: "2024-11-21 10:30",
       user: "admin@example.com",
-      action: "Modified",
+      action: "Added",
+      details: "Added Marketing department",
+    },
+    {
+      id: 2,
+      timestamp: "2024-11-22 14:45",
+      user: "user@example.com",
+      action: "Updated",
       details: "Updated Sales department",
+    },
+    {
+      id: 3,
+      timestamp: "2024-11-22 16:10",
+      user: "admin@example.com",
+      action: "Deleted",
+      details: "Deleted HR department",
     },
   ]);
   const [newDepartment, setNewDepartment] = useState<Pick<Department, "name" | "head" | "email">>({
@@ -85,9 +101,19 @@ const Settings: React.FC = () => {
         );
         setEditingId(null);
       } else {
-        setDepartments((prev) => [
+        const newDept = { id: Date.now(), ...newDepartment };
+        setDepartments((prev) => [...prev, newDept]);
+
+        // Log the addition to the audit log
+        setAuditLogs((prev) => [
           ...prev,
-          { id: Date.now(), ...newDepartment },
+          {
+            id: prev.length + 1,
+            timestamp: new Date().toISOString(),
+            user: "admin@example.com",
+            action: "Added",
+            details: `Added ${newDept.name} department`,
+          },
         ]);
       }
       setNewDepartment({ name: "", head: "", email: "" });
@@ -104,36 +130,23 @@ const Settings: React.FC = () => {
   };
 
   const handleDelete = (id: number) => {
-    setDepartments((prev) => prev.filter((dept) => dept.id !== id));
-  };
+    const dept = departments.find((dept) => dept.id === id);
+    if (dept) {
+      setDepartments((prev) => prev.filter((dept) => dept.id !== id));
 
-  const DepartmentCard: React.FC<{ department: Department }> = ({ department }) => (
-    <div className="bg-card border rounded-lg p-4 mb-4">
-      <div className="flex justify-between items-start mb-2">
-        <div>
-          <h3 className="font-medium">{department.name}</h3>
-          <p className="text-sm text-gray-500">{department.head}</p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleEdit(department)}
-          >
-            Edit
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleDelete(department.id)}
-          >
-            Delete
-          </Button>
-        </div>
-      </div>
-      <p className="text-sm">{department.email}</p>
-    </div>
-  );
+      // Log the deletion to the audit log
+      setAuditLogs((prev) => [
+        ...prev,
+        {
+          id: prev.length + 1,
+          timestamp: new Date().toISOString(),
+          user: "admin@example.com",
+          action: "Deleted",
+          details: `Deleted ${dept.name} department`,
+        },
+      ]);
+    }
+  };
 
   return (
     <div className="w-full max-w-6xl mx-auto p-4 space-y-6">
@@ -218,6 +231,34 @@ const Settings: React.FC = () => {
             >
               {editingId !== null ? "Update Department" : "Add Department"}
             </Button>
+            <TableBody>
+  {departments.map((department) => (
+    <TableRow key={department.id}>
+      <TableCell>{department.name}</TableCell>
+      <TableCell>{department.head}</TableCell>
+      <TableCell>{department.email}</TableCell>
+      <TableCell>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleEdit(department)} // Using handleEdit
+          >
+            Edit
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleDelete(department.id)} // Using handleDelete
+          >
+            Delete
+          </Button>
+        </div>
+      </TableCell>
+    </TableRow>
+  ))}
+</TableBody>
+
           </CardContent>
         </Card>
       )}
@@ -242,8 +283,8 @@ const Settings: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {auditLogs.map((log, index) => (
-                    <TableRow key={index}>
+                  {auditLogs.map((log) => (
+                    <TableRow key={log.id}>
                       <TableCell>{log.timestamp}</TableCell>
                       <TableCell>{log.user}</TableCell>
                       <TableCell>{log.action}</TableCell>
