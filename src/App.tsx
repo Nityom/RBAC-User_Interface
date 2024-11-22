@@ -5,6 +5,7 @@ import { Sidebar } from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
 import Roles from "./pages/Roles";
+import Settings from "./pages/Settings";
 
 
 const NotFound: React.FC = () => (
@@ -32,7 +33,7 @@ const App: React.FC = () => {
               {/* Default Route to Redirect to Dashboard */}
               <Route path="/" element={<Navigate to="/dashboard" />} />
               {/* Fallback Route for Undefined Paths */}
-              <Route path="*" element={<NotFound />} />
+              <Route path="/settings" element={<Settings />} />
             </Routes>
           </main>
         </div>
