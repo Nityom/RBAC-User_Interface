@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { deleteRole } from "@/redux/slices/roleSlice";
@@ -25,7 +25,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MoreHorizontal, Edit2, Trash2, Shield } from "lucide-react";
+import { Input } from "@/components/ui/input"; // Assuming you have a styled Input component
+import { MoreHorizontal, Edit2, Trash2, Shield, SortAsc, SortDesc } from "lucide-react";
 
 interface Role {
   id: string;
@@ -41,6 +42,10 @@ interface RoleTableProps {
 
 const RoleTable: React.FC<RoleTableProps> = ({ roles, onRoleClick, isLoading = false }) => {
   const dispatch: AppDispatch = useDispatch();
+
+  const [filter, setFilter] = useState("");
+  const [sortedBy, setSortedBy] = useState<"name" | null>(null);
+  const [isAscending, setIsAscending] = useState(true);
 
   const handleDelete = (roleId: string) => {
     dispatch(deleteRole(roleId));
@@ -61,6 +66,26 @@ const RoleTable: React.FC<RoleTableProps> = ({ roles, onRoleClick, isLoading = f
 
     return permissionMap[type || ""] || "secondary";
   };
+
+  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilter(e.target.value.toLowerCase());
+  };
+
+  const toggleSort = () => {
+    setSortedBy("name");
+    setIsAscending((prev) => !prev);
+  };
+
+  const filteredRoles = roles.filter((role) =>
+    role.name.toLowerCase().includes(filter)
+  );
+
+  const sortedRoles = sortedBy
+    ? [...filteredRoles].sort((a, b) => {
+        const compareValue = a.name.localeCompare(b.name);
+        return isAscending ? compareValue : -compareValue;
+      })
+    : filteredRoles;
 
   if (isLoading) {
     return (
@@ -86,6 +111,18 @@ const RoleTable: React.FC<RoleTableProps> = ({ roles, onRoleClick, isLoading = f
 
   return (
     <div className="w-full border rounded-lg overflow-x-auto">
+      <div className="p-4 flex justify-between items-center">
+        <Input
+          placeholder="Filter roles..."
+          value={filter}
+          onChange={handleFilterChange}
+          className="w-1/3"
+        />
+        <Button variant="outline" onClick={toggleSort} className="flex items-center gap-2">
+          {isAscending ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
+          Sort by Name
+        </Button>
+      </div>
       <Table className="min-w-full">
         <TableHeader>
           <TableRow>
@@ -97,7 +134,7 @@ const RoleTable: React.FC<RoleTableProps> = ({ roles, onRoleClick, isLoading = f
           </TableRow>
         </TableHeader>
         <TableBody>
-          {roles.map((role) => (
+          {sortedRoles.map((role) => (
             <TableRow key={role.id}>
               <TableCell className="font-medium">
                 <div className="flex items-center gap-2">

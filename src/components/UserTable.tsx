@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store"; // Ensure your store exports AppDispatch
 import { deleteUser } from "@/redux/slices/userSlice";
@@ -23,7 +23,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input"; // Assuming you have a styled Input component
+import { Edit, Trash2, SortAsc, SortDesc } from "lucide-react";
 
 interface User {
   id: string;
@@ -40,16 +41,68 @@ interface UserTableProps {
 const UserTable: React.FC<UserTableProps> = ({ users, onEdit }) => {
   const dispatch: AppDispatch = useDispatch();
 
+  const [filter, setFilter] = useState("");
+  const [sortCriteria, setSortCriteria] = useState<"name" | "role" | null>(null);
+  const [isAscending, setIsAscending] = useState(true);
+
   const handleDelete = (id: string) => {
     dispatch(deleteUser(id));
   };
 
   const getStatusBadgeVariant = (status: string): "default" | "secondary" => {
-      return status === "Active" ? "default" : "secondary";
+    return status === "Active" ? "default" : "secondary";
   };
+
+  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilter(e.target.value.toLowerCase());
+  };
+
+  const toggleSort = (criteria: "name" | "role") => {
+    setSortCriteria(criteria);
+    setIsAscending((prev) => (sortCriteria === criteria ? !prev : true));
+  };
+
+  const filteredUsers = users.filter((user) =>
+    user.name.toLowerCase().includes(filter) || user.role.toLowerCase().includes(filter)
+  );
+
+  const sortedUsers = sortCriteria
+    ? [...filteredUsers].sort((a, b) => {
+        const valueA = sortCriteria === "name" ? a.name : a.role;
+        const valueB = sortCriteria === "name" ? b.name : b.role;
+        const compareValue = valueA.localeCompare(valueB);
+        return isAscending ? compareValue : -compareValue;
+      })
+    : filteredUsers;
 
   return (
     <div className="rounded-md border">
+      <div className="p-4 flex justify-between items-center">
+        <Input
+          placeholder="Filter users..."
+          value={filter}
+          onChange={handleFilterChange}
+          className="w-1/3"
+        />
+        <div className="flex gap-4">
+          <Button
+            variant="outline"
+            onClick={() => toggleSort("name")}
+            className="flex items-center gap-2"
+          >
+            {sortCriteria === "name" && (isAscending ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
+            Sort by Name
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => toggleSort("role")}
+            className="flex items-center gap-2"
+          >
+            {sortCriteria === "role" && (isAscending ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />)}
+            Sort by Role
+          </Button>
+        </div>
+      </div>
       <Table>
         <TableHeader>
           <TableRow>
@@ -60,7 +113,7 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit }) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.map((user) => (
+          {sortedUsers.map((user) => (
             <TableRow key={user.id}>
               <TableCell className="font-medium">{user.name}</TableCell>
               <TableCell>{user.role}</TableCell>
@@ -112,7 +165,7 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit }) => {
               </TableCell>
             </TableRow>
           ))}
-          {users.length === 0 && (
+          {sortedUsers.length === 0 && (
             <TableRow>
               <TableCell colSpan={4} className="text-center text-muted-foreground">
                 No users found.

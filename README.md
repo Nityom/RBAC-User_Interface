@@ -23,6 +23,7 @@ RBAC (Role-Based Access Control) - User Interface is a web application that allo
 - Permission management
 - Assign roles to users
 - Assign permissions to roles
+- Sorting and filtering based on name and roles in both user and roles
 
 ## User Interface
 
