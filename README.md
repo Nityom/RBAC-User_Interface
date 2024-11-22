@@ -39,11 +39,11 @@ To get started with the project, follow these steps:
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/rbac-user-interface.git
+    git clone https://github.com/Nityom/RBAC-User_Interface.git
     ```
 2. Navigate to the project directory:
     ```bash
-    cd rbac-user-interface
+    cd RBAC-User_Interface
     ```
 3. Install the dependencies:
     ```bash
@@ -56,7 +56,7 @@ To run the application locally, use the following command:
 ```bash
 npm start
 ```
-Open your browser and navigate to `http://localhost:3000` to access the application.
+Open your browser and navigate to `http://localhost:5173` to access the application.
 
 ## Contributing
 
